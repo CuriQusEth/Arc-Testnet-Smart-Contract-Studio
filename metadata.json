@@ -1,0 +1,5 @@
+{
+  "name": "Arc Testnet Smart Contract Studio",
+  "description": "A panel for deploying and interacting with smart contracts on Arc Testnet, with a built-in GM Chain daily greeting transaction feature.",
+  "requestFramePermissions": []
+}
