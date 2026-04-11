@@ -10,6 +10,42 @@ export const AppKitSwap: React.FC = () => {
   const [feeRecipient, setFeeRecipient] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
   const [txHash, setTxHash] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  const generatedCode = `import { AppKit } from "@circle-fin/app-kit";
+import { createViemAdapterFromPrivateKey } from "@circle-fin/adapter-viem-v2";
+
+// Initialize App Kit
+const kit = new AppKit();
+
+// Setup Wallet Adapter (Viem example)
+const adapter = createViemAdapterFromPrivateKey({ 
+  privateKey: process.env.PRIVATE_KEY as string 
+});
+
+// Execute Swap
+const result = await kit.swap({
+  from: { adapter, chain: "Arc_Testnet" },
+  tokenIn: "${tokenIn}",
+  tokenOut: "${tokenOut}",
+  amountIn: "${amountIn}",
+  config: {
+    kitKey: process.env.KIT_KEY as string,
+    slippageBps: ${slippage}${customFee && feeRecipient ? `,
+    fee: {
+      amount: "${customFee}",
+      recipient: "${feeRecipient}"
+    }` : ''}
+  }
+});
+
+console.log("Swap result:", result.txHash, result.explorerUrl);`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generatedCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleExecute = () => {
     setIsExecuting(true);
@@ -29,10 +65,11 @@ export const AppKitSwap: React.FC = () => {
       </div>
       
       <p className="text-sm text-gray-400 mb-6">
-        Swap tokens natively on Arc Testnet.
+        Configure and generate a Node.js script to swap tokens natively using the Circle App Kit SDK.
       </p>
 
-      <div className="max-w-xl space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-gray-400 mb-1">Chain</label>
             <select disabled className="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-500 opacity-70 cursor-not-allowed">
@@ -138,6 +175,31 @@ export const AppKitSwap: React.FC = () => {
             </div>
           )}
         </div>
+
+        <div className="flex flex-col h-full">
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-xs font-medium text-gray-400">Generated TypeScript</label>
+            <button 
+              onClick={handleCopy}
+              className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              {copied ? <CheckCircle className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              {copied ? 'Copied!' : 'Copy Code'}
+            </button>
+          </div>
+          <div className="relative flex-1 bg-[#0d1117] rounded-md border border-gray-700 overflow-hidden">
+            <pre className="absolute inset-0 p-4 overflow-auto text-xs font-mono text-gray-300 custom-scrollbar">
+              <code>{generatedCode}</code>
+            </pre>
+          </div>
+          <div className="mt-3 bg-gray-900 border border-gray-700 rounded-md p-3">
+            <label className="block text-xs font-medium text-gray-500 mb-1">Install Dependencies</label>
+            <code className="text-xs text-green-400 font-mono select-all">
+              npm install @circle-fin/app-kit @circle-fin/adapter-viem-v2 viem
+            </code>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
