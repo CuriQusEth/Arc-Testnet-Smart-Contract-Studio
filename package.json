@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node compile.cjs",
     "dev": "vite --port=3000 --host=0.0.0.0",
+    "prebuild": "node compile.cjs",
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",

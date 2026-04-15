@@ -9,6 +9,12 @@ export default defineConfig(({mode}) => {
     plugins: [react(), tailwindcss()],
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+      'process.env.ARC_RPC_URL': JSON.stringify(env.ARC_RPC_URL),
+      'process.env.ARC_CHAIN_ID': JSON.stringify(env.ARC_CHAIN_ID),
+      'process.env.ARC_CHAIN_NAME': JSON.stringify(env.ARC_CHAIN_NAME),
+      'process.env.PRIVATE_KEY': JSON.stringify(env.PRIVATE_KEY),
+      'process.env.KIT_KEY': JSON.stringify(env.KIT_KEY),
+      'process.env.WALLET_ID': JSON.stringify(env.WALLET_ID),
     },
     resolve: {
       alias: {

@@ -3,7 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
+    <title>Arc Testnet Smart Contract Studio</title>
+    <script>
+      // Prevent isZerion and other property conflicts from multiple wallets
+      (function() {
+        const originalDefineProperty = Object.defineProperty;
+        Object.defineProperty = function(obj, prop, descriptor) {
+          if (obj === window.ethereum || obj === window) {
+            if (descriptor.get && descriptor.value !== undefined) {
+              delete descriptor.value;
+              delete descriptor.writable;
+            }
+            if (descriptor.set && descriptor.value !== undefined) {
+              delete descriptor.value;
+              delete descriptor.writable;
+            }
+          }
+          try {
+            return originalDefineProperty(obj, prop, descriptor);
+          } catch (e) {
+            console.warn(`Property ${String(prop)} could not be defined, skipped:`, e.message);
+            return obj;
+          }
+        };
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
