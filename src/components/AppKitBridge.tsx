@@ -47,14 +47,39 @@ console.log("Bridge TXs:", result.steps.map(s => s.txHash));`;
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleExecute = () => {
+  const handleExecute = async () => {
     setIsExecuting(true);
     setTxHash('');
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const { AppKit } = await import('@circle-fin/app-kit');
+      const { createBrowserAdapter } = await import('../lib/adapter');
+      
+      const kit = new AppKit();
+      const adapter = await createBrowserAdapter();
+      
+      const result = await kit.bridge({
+        from: { adapter, chain: fromChain },
+        to: { adapter, chain: toChain },
+        amount: amount,
+        token: "USDC",
+        config: { 
+          transferSpeed: speed,
+          ...(customFee && feeRecipient ? {
+            fee: {
+              amount: customFee,
+              recipient: feeRecipient
+            }
+          } : {})
+        }
+      });
+      
+      setTxHash(result.txHash || 'Success');
+    } catch (error: any) {
+      console.error("Bridge error:", error);
+      alert(`Error: ${error.message}`);
+    } finally {
       setIsExecuting(false);
-      setTxHash('0x' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join(''));
-    }, 2000);
+    }
   };
 
   return (

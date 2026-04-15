@@ -61,14 +61,30 @@ console.log("Send TX:", result.txHash, result.explorerUrl);`;
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleExecute = () => {
+  const handleExecute = async () => {
     setIsExecuting(true);
     setTxHash('');
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const { AppKit } = await import('@circle-fin/app-kit');
+      const { createBrowserAdapter } = await import('../lib/adapter');
+      
+      const kit = new AppKit();
+      const browserAdapter = await createBrowserAdapter();
+      
+      const result = await kit.send({
+        from: { adapter: browserAdapter, chain: chain },
+        to: recipient,
+        amount: amount,
+        token: activeToken || 'USDC',
+      });
+      
+      setTxHash(result.txHash || 'Success');
+    } catch (error: any) {
+      console.error("Send error:", error);
+      alert(`Error: ${error.message}`);
+    } finally {
       setIsExecuting(false);
-      setTxHash('0x' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join(''));
-    }, 2000);
+    }
   };
 
   return (
